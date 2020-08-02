@@ -103,6 +103,7 @@ def train(args, train_dataset, model, tokenizer):
             from apex import amp
         except ImportError:
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
+        print("device:", args.device)
         model.to(args.device)
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
@@ -422,7 +423,7 @@ def main():
 
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:
-        device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+        device = xm.xla_device()
         args.n_gpu = torch.cuda.device_count()
     else:  # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
         device = xm.xla_device()
